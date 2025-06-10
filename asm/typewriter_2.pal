@@ -1,0 +1,24 @@
+*200
+
+/ Вывод символа начала строки
+LINE,   TAD LF
+        TLS
+        CLA
+        TAD MARK        / !! Начальная команда, адрес 203 !!
+        TLS
+
+/ Считывание и вывод символа
+SYMBOL, KSF
+        JMP .-1
+        KRB
+        TLS
+
+        TAD ENTER       / Если введённый символ - это Enter, выводить начало строки
+        SNA
+        JMP LINE
+
+        JMP SYMBOL
+
+MARK,   '>'
+ENTER,  7763            / -CR
+LF,     0012            / LF

@@ -1,0 +1,31 @@
+*200
+
+        TAD LENGTH
+        CIA
+        DCA COUNTER
+
+LOOP,   TAD I ITEM
+        TPC
+        CLA CLL
+        TAD ITEM
+        IAC
+        DCA ITEM
+        ISZ COUNTER
+        JMP LOOP
+
+        HLT
+
+LENGTH, 13
+STRING, 'H'
+        'e'
+        'l'
+        'l'
+        'o'
+        ' '
+        'w'
+        'o'
+        'r'
+        'l'
+        'd'
+ITEM,   STRING
+COUNTER,0

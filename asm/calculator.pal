@@ -1,0 +1,180 @@
+*200
+
+/ Ввод первого числа
+FNUM,	KSF             / Инпут с клавиатуры
+        JMP .-1
+        KRB
+	TPC		/ Вывод в терминал
+
+	TAD NENTER	/ Получаем введённую цифру и переходим к обработке действия, если введена не цифра
+	SPA
+	JMP ACTION
+	DCA FIGURE
+	TAD FIGURE
+	TAD NEGT1
+	SNA
+	JMP ACTION
+	CLA CLL
+
+	TAD FNUMD	/ Читаем число
+	RTL		/ Умножение на 10
+	TAD FNUMD
+	RAL
+	TAD FIGURE	/ Добавляем считанную цифру
+
+	DCA FNUMD	/ Сохраняем результат
+
+	JMP FNUM
+
+/ Обработка ввода действия
+ACTION,	DCA ACTS
+
+/ Ввод второго числа
+SNUM,	KSF             / Инпут с клавиатуры
+        JMP .-1
+        KRB
+	TPC		/ Вывод в терминал
+
+	TAD NEQUAL	/ Если введено =, остановка ввода
+	SNA
+	JMP CALC
+
+	TAD NBITEQ 	/ Получаем введённую цифру и сохраняем
+	DCA FIGURE
+	CLL
+
+	TAD SNUMD	/ Читаем число
+	RTL		/ Умножение на 10
+	TAD SNUMD
+	RAL
+	TAD FIGURE	/ Добавляем считанную цифру
+
+	DCA SNUMD	/ Сохраняем результат
+
+	JMP SNUM
+
+/ Переход на нужную операцию
+CALC,	TAD ACTS
+        IAC             / Если /
+        SNA
+        JMP DIVIDE
+	TAD DTPLUS	/ Если +
+	SNA
+	JMP PLUS
+	TAD DTMIN	/ Если -
+	SNA
+	JMP MINUS
+        TAD DTMULT	/ Если *
+	SNA
+	JMP MULT
+
+	HLT
+
+/ Операция +
+PLUS,	TAD FNUMD
+	TAD SNUMD
+
+	JMP OUT
+
+/ Операция -
+MINUS,	TAD SNUMD
+	CIA
+	TAD FNUMD
+
+	JMP OUT
+
+/ Операция *
+MULT,   TAD SNUMD
+        DCA MULTPR
+        TAD FNUMD
+        MQL MUY
+MULTPR, 0000
+        MQA
+
+        JMP OUT
+
+/ Операция /
+DIVIDE, TAD SNUMD
+        DCA DIVISR
+        TAD FNUMD
+        MQL DVI
+DIVISR, 0000
+        CLA MQA
+
+        JMP OUT
+
+/ Вывод
+OUT,	DCA RESULT	/ Сохранение результата
+	DCA FIGURE	/ Обнуление цифры для вывода
+	TAD RESULT
+
+T3,	TAD NEGT3	/ Цикл вычитания 1000
+	SPA
+	JMP . + 3
+	ISZ FIGURE
+	JMP T3
+
+	JMS OUTNUM	/ Вывод тысяч
+	TAD POST3	/ Добавление потерянной 1000
+
+T2,	TAD NEGT2	/ Цикл вычитания 100
+	SPA
+	JMP . + 3
+	ISZ FIGURE
+	JMP T2
+
+	JMS OUTNUM	/ Вывод сотен
+	TAD POST2	/ Добавление потерянной 100
+
+T1,	TAD NEGT1	/ Цикл вычитания 10
+	SPA
+	JMP . + 3
+	ISZ FIGURE
+	JMP T1
+
+	JMS OUTNUM	/ Вывод десятков
+	TAD POST1	/ Добавление потерянной 10
+
+	TAD DIGGEN	/ Вывод единиц
+	TPC
+
+	HLT
+
+/ Функции
+OUTNUM,	0000            / Вывод числа в терминал
+	DCA ACTS        / Использую тут переменную ACTS, чтобы не создавать ещё одну
+	TAD FIGURE
+	TAD DIGGEN
+	TPC
+	CLA
+	DCA FIGURE
+	TAD ACTS
+	JMP I OUTNUM
+
+/ Переменные
+FIGURE,	0000		/ Введённая/выведенная цифра
+FNUMD,	0000		/ Первое число
+SNUMD,	0000		/ Первое число
+ACTS,	0000		/ Символ действия, которое надо выполнить
+RESULT,	0000		/ Результат вычисления
+
+/ Константы
+NENTER,	7720
+NEGT1,	7766		/ -10
+NEGT2,	7634		/ -100
+NEGT3,	6030		/ -1000
+POST3,	1750		/ 1000
+POST2,	0144		/ 100
+POST1,	0012		/ 10
+NEQUAL,	7703		/ -=
+NBITEQ,	0015		/ Для определения числа после клавиши =
+DTPLUS,	0004		/ Слагаемое для определения клавиши +
+DTMIN,	7776		/ Слагаемое для определения клавиши -
+DTMULT,	0003		/ Слагаемое для определения клавиши *
+DIGGEN,	0060		/ Слагаемое для получения символа цифры
+
+/ Команды
+MUY = 7405
+MQA = 7501
+MQL = 7421
+DVI = 7407
