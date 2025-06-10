@@ -10,7 +10,7 @@
 
 [<p style="font-size: 2em;">**Карта с компьютером**</p>](https://logic-arrows.io/map-rcLRm6iY)
 
-[![Снимок экрана из игры, видно процессор, часть памяти, панель управления, клавиатуру и терминал, на котором выведено "Hello world"](images\hello_world.png)](https://logic-arrows.io/map-rcLRm6iY)
+[![Снимок экрана из игры, видно процессор, часть памяти, панель управления, клавиатуру и терминал, на котором выведено "Hello world"](images/hello_world.png)](https://logic-arrows.io/map-rcLRm6iY)
 
 ## Характеристики
 * 12-битная архитектура
