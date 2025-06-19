@@ -1,9 +1,12 @@
 from inspect import getsourcefile
+from typing import IO
 import subprocess
 import argparse
 import os
 import math
 import arrows  # https://github.com/kala-telo/arrows.py
+import disasm
+import sys
 
 
 file_dir = os.path.dirname(getsourcefile(lambda:0))
@@ -44,6 +47,7 @@ parser.add_argument("--full", "-f", action="store_true", help="Генериро�
 parser.add_argument("--pal", "-P", action="store_true", help="Генерировать дискету из PAL-III")
 parser.add_argument("--po", "-p", action="store_true", help="Генерировать дискету из набора 8-ричных кодов")
 parser.add_argument("--bin", "-b", action="store_true", help="Генерировать дискету из бинарика simh")
+parser.add_argument("--debug", "-d", action="store_true", help="Вывод отладочной информации: адресов и значений всех ячеек памяти, дизассемблинг")
 parser.add_argument("infile", type=str, help="Файл программы на ассемблере")
 args = parser.parse_args()
 
@@ -164,6 +168,20 @@ def make_floppies(oct_data: list[str]):
     if args.full:
         print(floppy_drive.export())
 
+def debug(oct_data: list[str], out: IO):
+    # Вывод отладочной информации: адресов и значений всех ячеек памяти, а ещё дизассемблинг
+    test = f"Addr   Word   Asm        Meaning\n{'-'*90}\n"
+    for addr, word in enumerate(oct_data):
+        if word.isdigit():
+            test += oct(addr)[2:].zfill(4) + "   " + word.zfill(4) + "   " + disasm.operations[int(word, 8)] + "\n"
+
+    out.write(test)
+
+def link(oct_data: list[str], out: IO):
+    # Генерация ссылки на эмулятор pdp8.mckinnon.ninja с загруженными в память данными
+    test = "https://pdp8.mckinnon.ninja/?core=*0,0" + ",0".join(map(lambda x: (x.lstrip("0")) if (x.lstrip("0")) != "" else "0", oct_data))
+    out.write(test)
+
 if args.pal:
     with open(args.infile, "r", encoding="utf_8_sig") as in_file:
         with open(f"{file_dir}\\program.pa", "a") as program_file:
@@ -178,7 +196,7 @@ if args.pal:
                 program_file.write(line)
                 if line[0] not in ["/", "*"] and line != "\n":
                     program_asm.append(line.split("/", maxsplit=1)[0].replace("\n", ""))
-        subprocess.run(f"{MKASM_PATH} -{args.mkmode} -dump -D {file_dir}\\program.pa {file_dir}\\program.po")  # https://github.com/Rex--/mkasm
+        subprocess.run(f"{MKASM_PATH} -{args.mkmode} {'-dump' if args.debug else ''} -D {file_dir}\\program.pa {file_dir}\\program.po")  # https://github.com/Rex--/mkasm
 
     print()
 
@@ -202,22 +220,35 @@ elif args.bin:
     with open(args.infile, "rb") as in_file:
         content = in_file.read()  # [239:-239]
     content = content.strip(b'\x80')
-    if b'\x80'in content:
-        content = content[:content.index(b'\x80')-2]
+    content = content[:-2]
     oct_data = []
 
     addr = 0  # Адрес ячейки, куда надо записывать инструкцию
-    for i in range(0, len(content), 2):
+    i = 0  # Номер байта
+    ram_block = 0  # Номер блока памяти
+    while i < len(content):
         byte_1 = content[i]
-        byte_2 = content[i+1]
+        if len(content)-1 > i:
+            byte_2 = content[i+1]
+        else:
+            byte_2 = 0o0000
 
         # [ byte 1 ][ byte 2 ]
         # [ZXaaaaaa][Z0aaaaaa]
         # a - octal word bits
         # X - identifier of location counter
-        # Z - identifier of empty (?)
+        # Z - identifier of leader/trailer
+        #
+        # [ byte 1 ]
+        # [11aaa000]
+        # Setting memory block number to [aaa]
 
-        if byte_1 & 0x80 == 0x80:  # If the first bytes is empty 0x80
+        if byte_1 & 0xC0 == 0xC0:  # Setting memory block
+            ram_block = byte_1 & 0x38
+            i +=1
+            continue
+        elif byte_1 & 0x80 == 0x80:  # If the first bytes is empty 0x80
+            i += 1
             continue
         elif byte_1 & 0x40 == 0x40:  # If the word is identifier of location counter
             address = h2o(byte_1, byte_2)
@@ -231,14 +262,29 @@ elif args.bin:
                 oct_data[addr] = oct_word
         
         addr += 1
+        i += 2
+    
+    if args.debug:
+        debug(oct_data, sys.stdout)
 
     make_floppies(oct_data)
 elif args.po:
     oct_data = []
+
+    addr = 0  # Адрес ячейки, куда надо записывать инструкцию
     for i in open(args.infile, "r").read().split("\n"):
         if len(i) == 6 and i[:2] == "17":
-            oct_data.extend(["0"] * (int(i[2:6], 8) - len(oct_data)))
+            address = int(i[2:6], 8)
+            oct_data.extend(["0"] * (address - len(oct_data)))
+            addr = address-1
         else:
-            oct_data.append(i)
+            if addr > len(oct_data)-1:
+                oct_data.append(i)
+            else:
+                oct_data[addr] = i
+        addr += 1
     
+    if args.debug:
+        debug(oct_data, sys.stdout)
+
     make_floppies(oct_data)
