@@ -2,7 +2,7 @@
 
 / Ввод первого числа
 FNUM,	KSF             / Инпут с клавиатуры
-        JMP .-1
+         JMP .-1
         KRB
 	TPC		/ Вывод в терминал
 
@@ -105,51 +105,49 @@ DIVISR, 0000
 
 / Вывод
 OUT,	DCA RESULT	/ Сохранение результата
-	DCA FIGURE	/ Обнуление цифры для вывода
-	TAD RESULT
 
-T3,	TAD NEGT3	/ Цикл вычитания 1000
-	SPA
-	JMP . + 3
-	ISZ FIGURE
-	JMP T3
+        / Вывод тысяч
+	TAD POST3       / Сохранение 1000 в делителе
+        DCA T3DVSR
+        TAD RESULT
+        MQL DVI         / Деление результата на 1000
+T3DVSR, 0000
+        DCA RESULT      / Сохранение остатка
+        CLA MQA         / Получение частного
+        TAD DIGGEN      / Создание кода символа частного
+        TPC             / Вывод цифры в терминал
+        CLA
 
-	JMS OUTNUM	/ Вывод тысяч
-	TAD POST3	/ Добавление потерянной 1000
+        / Вывод сотен
+	TAD POST2       / Сохранение 100 в делителе
+        DCA T2DVSR
+        TAD RESULT
+        MQL DVI         / Деление результата на 100
+T2DVSR, 0000
+        DCA RESULT      / Сохранение остатка
+        CLA MQA         / Получение частного
+        TAD DIGGEN      / Создание кода символа частного
+        TPC             / Вывод цифры в терминал
+        CLA
 
-T2,	TAD NEGT2	/ Цикл вычитания 100
-	SPA
-	JMP . + 3
-	ISZ FIGURE
-	JMP T2
+        / Вывод десятков
+	TAD POST1       / Сохранение 10 в делителе
+        DCA T1DVSR
+        TAD RESULT
+        MQL DVI         / Деление результата на 10
+T1DVSR, 0000
+        DCA RESULT      / Сохранение остатка
+        CLA MQA         / Получение частного
+        TAD DIGGEN      / Создание кода символа частного
+        TPC             / Вывод цифры в терминал
+        CLA
 
-	JMS OUTNUM	/ Вывод сотен
-	TAD POST2	/ Добавление потерянной 100
-
-T1,	TAD NEGT1	/ Цикл вычитания 10
-	SPA
-	JMP . + 3
-	ISZ FIGURE
-	JMP T1
-
-	JMS OUTNUM	/ Вывод десятков
-	TAD POST1	/ Добавление потерянной 10
-
-	TAD DIGGEN	/ Вывод единиц
+        / Вывод единиц
+        TAD RESULT
+	TAD DIGGEN
 	TPC
 
 	HLT
-
-/ Функции
-OUTNUM,	0000            / Вывод числа в терминал
-	DCA ACTS        / Использую тут переменную ACTS, чтобы не создавать ещё одну
-	TAD FIGURE
-	TAD DIGGEN
-	TPC
-	CLA
-	DCA FIGURE
-	TAD ACTS
-	JMP I OUTNUM
 
 / Переменные
 FIGURE,	0000		/ Введённая/выведенная цифра
@@ -161,8 +159,6 @@ RESULT,	0000		/ Результат вычисления
 / Константы
 NENTER,	7720
 NEGT1,	7766		/ -10
-NEGT2,	7634		/ -100
-NEGT3,	6030		/ -1000
 POST3,	1750		/ 1000
 POST2,	0144		/ 100
 POST1,	0012		/ 10
