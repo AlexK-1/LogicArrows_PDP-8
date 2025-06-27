@@ -1,5 +1,7 @@
 # PDP-8 в Стрелочках
 
+![Logic Arrows map](https://img.shields.io/badge/logic--arrows-map-blue?logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cGF0aCBmaWxsPSIjNTAwIiBkPSJtOTkgMWMtMC44Ny0wLjg3LTIuMi0xLjMtMy42LTAuODJsLTc3IDI1Yy00LjkgMS43LTYuMyA3LjgtMi43IDExbDE1IDE1LTI5IDI5Yy0yLjcgMi43LTIuNyA3LjEgMCA5LjhsNyA3YzIuNyAyLjcgNy4xIDIuNyA5LjggMGwyOS0yOSAxNSAxNWMzLjcgMy43IDkuOCAyLjIgMTEtMi43bDI1LTc3YzAuNDktMS4zIDAuMDQ1LTIuNy0wLjgyLTMuNnoiIHN0cm9rZS13aWR0aD0iMS43Ii8+PC9zdmc+)
+
 Копия одного из первых массовых компьютеров [PDP-8](https://en.wikipedia.org/wiki/PDP-8) компании Digital Equipment Corporation 1965 года и его советской копии ЭВМ Элеткроника-100, сделанная в игре [Logic Arrows](https://www.youtube.com/channel/UCzdmz_lLWT_dPqOvFjXAMVg) или Стрелочки ютубера Onigiri (им сделана игра, а не компьютер).
 
 Файлы документации (навигация):
