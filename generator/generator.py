@@ -48,7 +48,7 @@ parser.add_argument("--pal", "-P", action="store_true", help="Генериров
 parser.add_argument("--po", "-p", action="store_true", help="Генерировать дискету из набора 8-ричных кодов")
 parser.add_argument("--bin", "-b", action="store_true", help="Генерировать дискету из бинарика simh")
 parser.add_argument("--debug", "-d", action="store_true", help="Вывод отладочной информации: адресов и значений всех ячеек памяти, дизассемблинг")
-parser.add_argument("infile", type=str, help="Файл программы на ассемблере")
+parser.add_argument("infile", type=str, help="Файл с программой")
 args = parser.parse_args()
 
 program_asm = []
