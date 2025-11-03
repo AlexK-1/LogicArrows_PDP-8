@@ -13,12 +13,14 @@ SYMBOL, KSF
         KRB
         TLS
 
-        TAD ENTER       / Если введённый символ - это Enter, выводить начало строки
-        SNA
+        TAD ENTER       / Если введённый символ - это
+        SNA             / Enter, выводить начало строки
         JMP LINE
 
         JMP SYMBOL
 
-MARK,   '>'
+MARK,   76              / '>'
 ENTER,  7763            / -CR
 LF,     0012            / LF
+
+$
